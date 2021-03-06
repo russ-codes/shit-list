@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Add repository</h1>
+
+<div mat-dialog-content>
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Repository clone URL</mat-label>
+      <input matInput [(ngModel)]="repository.cloneUrl" autocomplete="off"/>
+      <mat-hint>Make sure the username and access token have read rights to this url.</mat-hint>
+    </mat-form-field>
+  </p>
+
+  <div mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-raised-button [mat-dialog-close]="repository" color="primary">
+      Save
+    </button>
+  </div>
+</div>

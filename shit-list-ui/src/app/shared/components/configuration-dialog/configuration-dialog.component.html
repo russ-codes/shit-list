@@ -1,0 +1,26 @@
+<h1 mat-dialog-title>Configuration</h1>
+
+<div mat-dialog-content>
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput [(ngModel)]="configuration.username" autocomplete="off" />
+      <mat-hint></mat-hint>
+    </mat-form-field>
+  </p>
+
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Access key</mat-label>
+      <input matInput type='password' [(ngModel)]="configuration.accessToken" autocomplete="off" />
+      <mat-hint></mat-hint>
+    </mat-form-field>
+  </p>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button [mat-dialog-close]="configuration" color="primary">
+    Save
+  </button>
+</div>
