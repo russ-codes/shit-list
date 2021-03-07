@@ -9,7 +9,7 @@ public interface TotalService {
 
   Total zeroTotal();
 
-  Total increaseTotalTests(long value);
+  Total increaseTest(long value);
 
-  Total increaseTotalIgnored(long value);
+  Total increaseIgnored(long value);
 }

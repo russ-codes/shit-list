@@ -4,9 +4,9 @@ package io.shit.list.services;
 import io.shit.list.domain.Configuration;
 import io.shit.list.domain.Repository;
 import io.shit.list.repositories.ConfigurationRepository;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -27,13 +27,12 @@ public class GitServiceImpl implements GitService {
   private final ConfigurationRepository configurationRepository;
 
   /**
-   * Clone a repository into a temporary directory and return that directory. If unable to clone or
-   * create the working directory. This is a bit dirty but works the blocking clone process into a
-   * future so we can consume it as a Mono down stream.
+   * Clone a repository into a temporary directory. This is a bit dirty but works the blocking clone
+   * process into a future so we can consume it as a Mono down stream.
    */
   @Override
   public CompletableFuture<Repository> cloneRepository(final Repository repository) {
-    if (StringUtils.isEmpty(repository.getDirectory())) {
+    if (Objects.isNull(repository.getDirectory())) {
       repository.setDirectory(createWorkingDirectory());
     }
 
@@ -58,7 +57,7 @@ public class GitServiceImpl implements GitService {
     try {
       getCloneCommand()
           .setURI(repository.getCloneUrl())
-          .setDirectory(new File(repository.getDirectory()))
+          .setDirectory(repository.getDirectory().toFile())
           .call();
     } catch (GitAPIException gitAPIException) {
       log.error("Unable to clone repository {}", gitAPIException.getMessage(), gitAPIException);

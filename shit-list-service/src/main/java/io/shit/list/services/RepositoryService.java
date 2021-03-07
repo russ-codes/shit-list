@@ -17,7 +17,7 @@ public interface RepositoryService {
 
   Mono<Repository> sync(Repository repository);
 
-  Flux<Repository> sync();
+  Flux<Repository> syncAll();
 
   Mono<Repository> setProcessing(final Repository repository);
 

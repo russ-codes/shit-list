@@ -21,6 +21,6 @@ public class TaskController {
   @GetMapping("/sync")
   public Flux<Repository> sync() {
 
-    return repositoryService.sync();
+    return repositoryService.syncAll();
   }
 }

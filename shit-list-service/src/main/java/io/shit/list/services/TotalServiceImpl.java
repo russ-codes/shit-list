@@ -34,7 +34,7 @@ public class TotalServiceImpl implements TotalService {
   }
 
   @Override
-  public synchronized Total increaseTotalTests(long value) {
+  public synchronized Total increaseTest(long value) {
     final Total total = find();
 
     total.setTotalTests(total.getTotalTests() + value);
@@ -43,7 +43,7 @@ public class TotalServiceImpl implements TotalService {
   }
 
   @Override
-  public synchronized Total increaseTotalIgnored(long value) {
+  public synchronized Total increaseIgnored(long value) {
     final Total total = find();
 
     total.setTotalIgnored(total.getTotalIgnored() + value);
