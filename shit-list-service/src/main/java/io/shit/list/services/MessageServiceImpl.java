@@ -15,9 +15,6 @@ public class MessageServiceImpl implements MessageService {
 
   @Override
   public void sendMessage(final String topic, final Object payload) {
-
-    log.info("Sending message to {}", topic);
-
     messagingTemplate.convertAndSend(topic, payload);
   }
 }
