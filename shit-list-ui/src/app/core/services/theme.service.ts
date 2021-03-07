@@ -4,10 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { StyleManagerService } from './style-manager.service';
 import { LOCAL_STORAGE, StorageService } from 'ngx-webstorage-service';
-import {Option} from "../domain/option.module";
+import { Option } from '../domain/option.module';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ThemeService {
   constructor(

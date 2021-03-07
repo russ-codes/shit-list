@@ -7,6 +7,6 @@ import { RoutingModule } from './home.routing';
   declarations: [DefaultComponent],
   imports: [SharedModule, RoutingModule],
   exports: [],
-  entryComponents: [],
+  entryComponents: []
 })
 export class HomeModule {}

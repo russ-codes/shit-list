@@ -45,16 +45,16 @@
           <ng-container matColumnDef="state">
             <th mat-header-cell mat-sort-header *matHeaderCellDef>State</th>
             <td class="is-editable" mat-cell *matCellDef="let element" (click)="goTo(element)">
-              <ng-template [ngIf]='element.state === "new"'>
-                <mat-icon class="material-icons-outlined" [matTooltip]='"Not processed yet"'>build_circle</mat-icon>
+              <ng-template [ngIf]="element.state === 'new'">
+                <mat-icon class="material-icons-outlined" [matTooltip]="'Not processed yet'">build_circle</mat-icon>
               </ng-template>
 
-              <ng-template [ngIf]='element.state === "processing"'>
-                <mat-icon class="material-icons-outlined" [matTooltip]='"Processing"'>pending</mat-icon>
+              <ng-template [ngIf]="element.state === 'processing'">
+                <mat-icon class="material-icons-outlined" [matTooltip]="'Processing'">pending</mat-icon>
               </ng-template>
 
-              <ng-template [ngIf]='element.state === "complete"'>
-                <mat-icon class="material-icons-outlined" [matTooltip]='"Processing complete"'>check_circle_outline</mat-icon>
+              <ng-template [ngIf]="element.state === 'complete'">
+                <mat-icon class="material-icons-outlined" [matTooltip]="'Processing complete'">check_circle_outline</mat-icon>
               </ng-template>
             </td>
           </ng-container>
