@@ -13,27 +13,27 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-    private final ConfigurationRepository configurationRepository;
+  private final ConfigurationRepository configurationRepository;
 
-    @Override
-    public Mono<Configuration> save(final Configuration configuration) {
+  @Override
+  public Mono<Configuration> save(final Configuration configuration) {
 
-        log.info("Saving: {}", configuration);
+    log.info("Saving: {}", configuration);
 
-        return Mono.justOrEmpty(configurationRepository.save(configuration));
-    }
+    return Mono.justOrEmpty(configurationRepository.save(configuration));
+  }
 
-    @Override
-    public Mono<Configuration> find() {
+  @Override
+  public Mono<Configuration> find() {
 
-        final Configuration configuration =
-                configurationRepository.findById(1L).orElse(Configuration.builder().build());
+    final Configuration configuration =
+        configurationRepository.findById(1L).orElse(Configuration.builder().build());
 
-        return Mono.justOrEmpty(configuration);
-    }
+    return Mono.justOrEmpty(configuration);
+  }
 
-    @Override
-    public Mono<Configuration> updateStats(final long totalTests, final long totalIgnored) {
-        return Mono.empty();
-    }
+  @Override
+  public Mono<Configuration> updateStats(final long totalTests, final long totalIgnored) {
+    return Mono.empty();
+  }
 }

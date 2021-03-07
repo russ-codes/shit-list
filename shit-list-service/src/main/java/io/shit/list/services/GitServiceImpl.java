@@ -2,17 +2,20 @@
 package io.shit.list.services;
 
 import io.shit.list.domain.Configuration;
+import io.shit.list.domain.Repository;
 import io.shit.list.repositories.ConfigurationRepository;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.stereotype.Service;
 
@@ -25,35 +28,54 @@ public class GitServiceImpl implements GitService {
 
   /**
    * Clone a repository into a temporary directory and return that directory. If unable to clone or
-   * create the working directory, exceptions are hidden for now because I'm lazy...
+   * create the working directory. This is a bit dirty but works the blocking clone process into a
+   * future so we can consume it as a Mono down stream.
    */
   @Override
-  @SneakyThrows
-  public Path clone(final String cloneUrl) {
+  public CompletableFuture<Repository> cloneRepository(final Repository repository) {
+    if (StringUtils.isEmpty(repository.getDirectory())) {
+      repository.setDirectory(createWorkingDirectory());
+    }
 
-    final Path workingDirectory = createWorkingDirectory();
+    return CompletableFuture.supplyAsync(
+        () -> {
+          executeClone(repository);
+
+          return repository;
+        });
+  }
+
+  /** Create a clone command with credentials if required. */
+  private CloneCommand getCloneCommand() {
     final CloneCommand cloneCommand = Git.cloneRepository();
-
-    // Only set credentials if we have them
     credentialsProvider().ifPresent(cloneCommand::setCredentialsProvider);
 
-    cloneCommand.setURI(cloneUrl).setDirectory(workingDirectory.toFile()).call();
+    return cloneCommand;
+  }
 
-    log.info("Cloned {} into {}", cloneUrl, workingDirectory);
-
-    return workingDirectory;
+  /** Preform the actual cloning of the repository. */
+  private void executeClone(final Repository repository) {
+    try {
+      getCloneCommand()
+          .setURI(repository.getCloneUrl())
+          .setDirectory(new File(repository.getDirectory()))
+          .call();
+    } catch (GitAPIException gitAPIException) {
+      log.error("Unable to clone repository {}", gitAPIException.getMessage(), gitAPIException);
+    }
   }
 
   /**
    * Attempt to create a generic working directory to clone stuff into. This will go into the system
    * default temp directory.
    */
-  private Path createWorkingDirectory() throws IOException {
-    final Path tempDirectory = Files.createTempDirectory("shit.list.");
-
-    log.info("Working directory: {}", tempDirectory.toFile().toString());
-
-    return tempDirectory;
+  private String createWorkingDirectory() {
+    try {
+      return Files.createTempDirectory("shit.list.").toString();
+    } catch (IOException ioException) {
+      log.error("Unable to create working directory {}", ioException.getMessage(), ioException);
+      throw new RuntimeException(ioException);
+    }
   }
 
   /**
@@ -62,16 +84,23 @@ public class GitServiceImpl implements GitService {
    */
   private Optional<UsernamePasswordCredentialsProvider> credentialsProvider() {
 
-    final Optional<Configuration> configuration = configurationRepository.findById(1L);
-
-    return configuration
-        .filter(
-            c ->
-                StringUtils.isNoneEmpty(c.getAccessToken())
-                    && StringUtils.isNoneEmpty(c.getAccessToken()))
+    return configurationRepository
+        .findById(1L)
+        .filter(filterUnsafeCredentials())
         .map(
             value ->
                 new UsernamePasswordCredentialsProvider(
                     value.getUsername(), value.getAccessToken()));
+  }
+
+  /**
+   * Don't attempt to use credentials that have either username or access token as blank. JGit
+   * doesn't like it.
+   */
+  private Predicate<Configuration> filterUnsafeCredentials() {
+
+    return configuration ->
+        StringUtils.isNoneEmpty(configuration.getAccessToken())
+            && StringUtils.isNoneEmpty(configuration.getAccessToken());
   }
 }
