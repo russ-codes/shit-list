@@ -6,6 +6,7 @@ import io.shit.list.domain.Repository;
 import io.shit.list.repositories.ConfigurationRepository;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -32,28 +33,30 @@ public class GitServiceImpl implements GitService {
    */
   @Override
   public CompletableFuture<Repository> cloneRepository(final Repository repository) {
-    if (Objects.isNull(repository.getDirectory())) {
-      repository.setDirectory(createWorkingDirectory());
-    }
 
-    return CompletableFuture.supplyAsync(
-        () -> {
-          executeClone(repository);
+    return Objects.isNull(repository.getDirectory())
+        ? CompletableFuture.supplyAsync(() -> executeClone(repository))
+        : CompletableFuture.supplyAsync(() -> executePull(repository));
+  }
 
-          return repository;
-        });
+  /** TODO */
+  private Repository executePull(Repository repository) {
+    return repository;
   }
 
   /** Create a clone command with credentials if required. */
   private CloneCommand getCloneCommand() {
-    final CloneCommand cloneCommand = Git.cloneRepository();
-    credentialsProvider().ifPresent(cloneCommand::setCredentialsProvider);
+    final CloneCommand command = Git.cloneRepository();
 
-    return cloneCommand;
+    credentialsProvider().ifPresent(command::setCredentialsProvider);
+
+    return command;
   }
 
   /** Preform the actual cloning of the repository. */
-  private void executeClone(final Repository repository) {
+  private Repository executeClone(final Repository repository) {
+    repository.setDirectory(createWorkingDirectory());
+
     try {
       getCloneCommand()
           .setURI(repository.getCloneUrl())
@@ -62,6 +65,8 @@ public class GitServiceImpl implements GitService {
     } catch (GitAPIException gitAPIException) {
       log.error("Unable to clone repository {}", gitAPIException.getMessage(), gitAPIException);
     }
+
+    return repository;
   }
 
   /**
@@ -70,7 +75,10 @@ public class GitServiceImpl implements GitService {
    */
   private String createWorkingDirectory() {
     try {
-      return Files.createTempDirectory("shit.list.").toString();
+      final Path path = Files.createTempDirectory("shit.list.");
+      path.toFile().deleteOnExit();
+
+      return path.toString();
     } catch (IOException ioException) {
       log.error("Unable to create working directory {}", ioException.getMessage(), ioException);
       throw new RuntimeException(ioException);
