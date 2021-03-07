@@ -4,7 +4,7 @@ spring:
       enabled: true
       path: /h2
   datasource:
-    url: jdbc:h2:file:/home/chris/IdeaProjects/shit-list/db;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:./.data/db
     username: sa
     password:
     driverClassName: org.h2.Driver
