@@ -31,9 +31,4 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     return Mono.justOrEmpty(configuration);
   }
-
-  @Override
-  public Mono<Configuration> updateStats(final long totalTests, final long totalIgnored) {
-    return Mono.empty();
-  }
 }

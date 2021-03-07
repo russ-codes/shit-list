@@ -9,6 +9,4 @@ public interface ConfigurationService {
   Mono<Configuration> save(Configuration configuration);
 
   Mono<Configuration> find();
-
-  Mono<Configuration> updateStats(long totalTests, long totalIgnored);
 }
