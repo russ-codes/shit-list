@@ -1,24 +1,23 @@
-import {Component, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
-import {ThemeService} from '../../core/services/theme.service';
-import {MatDialog} from "@angular/material/dialog";
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ThemeService } from '../../core/services/theme.service';
+import { MatDialog } from '@angular/material/dialog';
 import {
   ConfigurationDialogComponent,
   ConfigurationDialogData
-} from "../../shared/components/configuration-dialog/configuration-dialog.component";
-import {ConfigurationService} from "../../core/services/configuration.service";
-import {Option} from "../../core/domain/option.module";
+} from '../../shared/components/configuration-dialog/configuration-dialog.component';
+import { ConfigurationService } from '../../core/services/configuration.service';
+import { Option } from '../../core/domain/option.module';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
   options$: Observable<Array<Option>> = new Observable<Array<Option>>();
 
-  constructor(private readonly themeService: ThemeService, private dialog: MatDialog, private configurationService: ConfigurationService) {
-  }
+  constructor(private readonly themeService: ThemeService, private dialog: MatDialog, private configurationService: ConfigurationService) {}
 
   ngOnInit() {
     this.options$ = this.themeService.getThemeOptions();
@@ -41,22 +40,20 @@ export class NavbarComponent implements OnInit {
   }
 
   openConfigDialog() {
-
-    this.configurationService.find().subscribe(configuration => {
-
-      if(configuration === null) {
+    this.configurationService.find().subscribe((configuration) => {
+      if (configuration === null) {
         configuration = {
-          username: "",
-          accessToken: ""
+          username: '',
+          accessToken: ''
         };
       }
 
-      const data: ConfigurationDialogData = {configuration}
+      const data: ConfigurationDialogData = { configuration };
 
       console.log(configuration);
 
       this.dialog
-        .open(ConfigurationDialogComponent, {data: data})
+        .open(ConfigurationDialogComponent, { data: data })
         .afterClosed()
         .subscribe((configuration) => {
           if (configuration === undefined) return;

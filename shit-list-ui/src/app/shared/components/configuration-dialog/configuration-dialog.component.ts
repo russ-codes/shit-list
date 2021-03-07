@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {Configuration} from "../../../core/domain/configuration.module";
+import { Configuration } from '../../../core/domain/configuration.module';
 
 export interface ConfigurationDialogData {
   configuration: Configuration;
@@ -9,7 +9,7 @@ export interface ConfigurationDialogData {
 @Component({
   selector: 'app-configuration-dialog',
   templateUrl: './configuration-dialog.component.html',
-  styleUrls: ['./configuration-dialog.component.scss'],
+  styleUrls: ['./configuration-dialog.component.scss']
 })
 export class ConfigurationDialogComponent {
   configuration: Configuration;

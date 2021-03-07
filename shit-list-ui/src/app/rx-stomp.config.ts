@@ -5,5 +5,5 @@ export const rxStompConfig: InjectableRxStompConfig = {
   connectHeaders: {},
   heartbeatIncoming: 0,
   heartbeatOutgoing: 20000,
-  reconnectDelay: 200,
+  reconnectDelay: 200
 };

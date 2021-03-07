@@ -12,7 +12,6 @@ import { MatDialog } from '@angular/material/dialog';
   providedIn: 'root'
 })
 export class RepositoryService {
-
   private readonly endpoint;
 
   private dataSource = new MatTableDataSource();
@@ -74,5 +73,4 @@ export class RepositoryService {
 
     this.dataSource.data = data;
   }
-
 }

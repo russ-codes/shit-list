@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {Repository} from "../../../core/domain/repository.module";
+import { Repository } from '../../../core/domain/repository.module';
 
 export interface RepositoryDialogData {
   repository: Repository;
@@ -9,7 +9,7 @@ export interface RepositoryDialogData {
 @Component({
   selector: 'app-repository-dialog',
   templateUrl: './add-repository-dialog.component.html',
-  styleUrls: ['./add-repository-dialog.component.scss'],
+  styleUrls: ['./add-repository-dialog.component.scss']
 })
 export class AddRepositoryDialogComponent {
   repository: Repository;

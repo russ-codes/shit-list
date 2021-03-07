@@ -77,7 +77,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatTooltipModule,
     MatTreeModule,
     MatFormFieldModule,
-    MatAutocompleteModule,
-  ],
+    MatAutocompleteModule
+  ]
 })
 export class MaterialModule {}
