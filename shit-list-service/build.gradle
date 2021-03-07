@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':shit-list-ui')
+    implementation project(':shit-list-ui')
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
