@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-//    compile project(':shit-list-ui')
+    compile project(':shit-list-ui')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
