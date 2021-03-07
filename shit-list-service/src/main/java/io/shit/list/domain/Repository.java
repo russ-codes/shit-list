@@ -19,4 +19,10 @@ public class Repository {
   @GeneratedValue @Id private long id;
 
   private String cloneUrl;
+
+  private long totalTests;
+
+  private long totalIgnored;
+
+  private String state = "New";
 }

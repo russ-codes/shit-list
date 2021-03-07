@@ -8,7 +8,6 @@ import { Configuration } from '../domain/configuration.module';
   providedIn: 'root'
 })
 export class TaskService {
-
   private readonly endpoint;
 
   constructor(private httpClient: HttpClient, private snackBar: MatSnackBar) {
@@ -16,11 +15,14 @@ export class TaskService {
   }
 
   sync() {
+    this.snackBar.open('Syncing started...', undefined, {
+      duration: 500
+    });
+
     return this.httpClient.get<Configuration>(`${this.endpoint}/sync`).subscribe(() => {
-      this.snackBar.open('Starting sync of repositories', undefined, {
+      this.snackBar.open('Syncing complete', undefined, {
         duration: 3000
       });
     });
   }
 }
-

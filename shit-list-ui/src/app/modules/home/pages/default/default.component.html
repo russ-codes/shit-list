@@ -1,59 +1,51 @@
-<div class='section' *ngIf='configuration$ | async as configuration'>
-  <div class='container is-fluid'>
-    <div class='columns is-multiline'>
-
-      <div class='column is-6'>
-        <div class='status has-text-centered'>
+<div class="section">
+  <div class="container is-fluid">
+    <div class="columns is-multiline">
+      <div class="column is-6">
+        <div class="status has-text-centered">
           <p>Total tests</p>
-          <p class='meta-number'>{{configuration.totalTests}}</p>
+          <p class="meta-number">{{ total.totalTests }}</p>
         </div>
       </div>
-      <div class='column is-6'>
-        <div class='status has-text-centered'>
+      <div class="column is-6">
+        <div class="status has-text-centered">
           <p>Total ignored</p>
-          <p class='meta-number'>{{configuration.totalIgnored}}</p>
+          <p class="meta-number">{{ total.totalIgnored }}</p>
         </div>
       </div>
 
-      <div class='column is-12 has-text-centered'>
-        <button mat-flat-button color='primary' (click)='sync()'>
-          Refresh
-        </button>
+      <div class="column is-12 has-text-centered">
+        <button mat-flat-button color="primary" (click)="sync()">Refresh</button>
       </div>
     </div>
   </div>
 </div>
 
+<div class="section">
+  <div class="container is-fluid">
+    <div class="columns is-multiline">
+      <h1 class="mat-title">Repositories</h1>
 
-<div class='section'>
-  <div class='container is-fluid'>
-    <div class='columns is-multiline'>
-      <h1 class='mat-title'>Repositories</h1>
-
-      <div class='column is-12'>
-
-        <table mat-table [dataSource]='dataSource' matSort>
-          <ng-container matColumnDef='id'>
+      <div class="column is-12">
+        <table mat-table [dataSource]="dataSource" matSort>
+          <ng-container matColumnDef="id">
             <th mat-header-cell mat-sort-header *matHeaderCellDef>Id</th>
-            <td
-              class='is-editable'
-              mat-cell
-              *matCellDef='let element'
-              (click)='goTo(element)'
-            >
+            <td class="is-editable" mat-cell *matCellDef="let element" (click)="goTo(element)">
               {{ element.id }}
             </td>
           </ng-container>
 
-          <ng-container matColumnDef='cloneUrl'>
+          <ng-container matColumnDef="cloneUrl">
             <th mat-header-cell mat-sort-header *matHeaderCellDef>Clone URL</th>
-            <td
-              class='is-editable'
-              mat-cell
-              *matCellDef='let element'
-              (click)='goTo(element)'
-            >
+            <td class="is-editable" mat-cell *matCellDef="let element" (click)="goTo(element)">
               {{ element.cloneUrl }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="state">
+            <th mat-header-cell mat-sort-header *matHeaderCellDef>State</th>
+            <td class="is-editable" mat-cell *matCellDef="let element" (click)="goTo(element)">
+              {{ element.state }}
             </td>
           </ng-container>
 
@@ -70,13 +62,12 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef='displayedColumns; sticky: true'></tr>
-          <tr mat-row *matRowDef='let row; columns: displayedColumns'></tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
-
       </div>
     </div>
   </div>
 </div>
 
-<app-action-button (clickedEvent)='addRepository()' [tooltip]="'Add new repository'"></app-action-button>
+<app-action-button (clickedEvent)="addRepository()" [tooltip]="'Add new repository'"></app-action-button>
