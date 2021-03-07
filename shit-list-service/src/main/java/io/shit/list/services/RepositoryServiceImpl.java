@@ -4,8 +4,9 @@ package io.shit.list.services;
 import io.shit.list.domain.Repository;
 import io.shit.list.repositories.RepositoryRepository;
 import io.shit.list.utils.ContentUtils;
-import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -66,17 +67,17 @@ public class RepositoryServiceImpl implements RepositoryService {
         .subscribeOn(this.scheduler)
         .flatMap(optional -> optional.map(Mono::just).orElseGet(Mono::empty))
         .doOnNext(this::setProcessing)
-        .flatMap(this::process)
+        .flatMap(this::processClone)
         .doOnNext(this::setComplete);
   }
 
   @Override
-  public Flux<Repository> sync() {
+  public Flux<Repository> syncAll() {
     totalService.zeroTotal();
 
     return Flux.fromIterable(repositoryRepository.findAll())
         .doOnNext(this::setProcessing)
-        .flatMap(this::process)
+        .flatMap(this::processClone)
         .doOnNext(this::setComplete);
   }
 
@@ -101,26 +102,29 @@ public class RepositoryServiceImpl implements RepositoryService {
   }
 
   @SneakyThrows
-  private Mono<Repository> process(final Repository repository) {
+  private Mono<Repository> processClone(final Repository repository) {
 
     return Mono.defer(
             () ->
                 Mono.fromFuture(gitService.cloneRepository(repository))
-                    .map(repo -> fileService.findAllJavaFiles(Path.of(repo.getDirectory())))
-                    .doOnNext(paths -> totalService.increaseTotalTests(filterTests(paths)))
-                    .doOnNext(paths -> totalService.increaseTotalIgnored(filterIgnored(paths)))
-                    .doAfterTerminate(
-                        () -> FileUtils.deleteQuietly(new File(repository.getDirectory()))))
+                    .map(repo -> fileService.findAllJavaFiles(repo.getDirectory()))
+                    .doOnNext(paths -> totalService.increaseTest(filterTests(paths).count()))
+                    .doOnNext(paths -> totalService.increaseIgnored(filterIgnored(paths).count()))
+                    .doAfterTerminate(() -> cleanUp(repository)))
         .thenReturn(repository);
   }
 
-  private long filterTests(final java.util.List<Path> paths) {
-    return paths.stream().filter(ContentUtils::hasTestContent).count();
+  private Stream<Path> filterTests(final List<Path> paths) {
+    return paths.stream().filter(ContentUtils::hasTestContent);
   }
 
-  private long filterIgnored(final java.util.List<Path> paths) {
+  private Stream<Path> filterIgnored(final List<Path> paths) {
     return paths.stream()
-        .filter(p -> ContentUtils.hasIgnoredContent(p) || ContentUtils.hasDisabledContent(p))
-        .count();
+        .filter(p -> ContentUtils.hasIgnoredContent(p) || ContentUtils.hasDisabledContent(p));
+  }
+
+  /** No matter what happens, delete the temp directory. */
+  private void cleanUp(final Repository repository) {
+    FileUtils.deleteQuietly(repository.getDirectory().toFile());
   }
 }
