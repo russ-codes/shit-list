@@ -10,17 +10,28 @@ import { SharedModule } from './shared';
 import { MaterialModule } from './shared/material.module';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+import { InjectableRxStompConfig, RxStompService, rxStompServiceFactory } from '@stomp/ng2-stompjs';
+import {rxStompConfig} from "./rx-stomp.config";
 
 @NgModule({
   declarations: [AppComponent, ContentLayoutComponent, NavbarComponent],
   imports: [AppRoutingModule, BrowserAnimationsModule, BrowserModule, MaterialModule, SharedModule],
   providers: [
     {
+      provide: InjectableRxStompConfig,
+      useValue: rxStompConfig,
+    },
+    {
+      provide: RxStompService,
+      useFactory: rxStompServiceFactory,
+      deps: [InjectableRxStompConfig],
+    },
+    {
       provide: MAT_DIALOG_DEFAULT_OPTIONS,
       useValue: {
         hasBackdrop: true,
         width: '30vw',
-        minWidth: '400px',
+        minWidth: '300px',
       },
     },
     {

@@ -2,60 +2,60 @@
 package io.shit.list.tasks;
 
 import io.shit.list.domain.Repository;
-import io.shit.list.services.ConfigurationService;
-import io.shit.list.services.FileService;
-import io.shit.list.services.GitService;
-import io.shit.list.services.RepositoryService;
+import io.shit.list.services.*;
 import io.shit.list.utils.ContentUtils;
-import java.nio.file.Path;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.nio.file.Path;
+import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RepositoryTask {
 
-  private static int totalTests;
+    private final RepositoryService repositoryService;
 
-  private static int totalIgnored;
+    private final GitService gitService;
 
-  private final RepositoryService repositoryService;
+    private final FileService fileService;
 
-  private final ConfigurationService configurationService;
+    private final TotalService totalService;
 
-  private final GitService gitService;
+    private final MessageService messageService;
 
-  private final FileService fileService;
+    /**
+     * For every repository we have, clone it down for processing.
+     * @return
+     */
+    public Flux<Repository> sync() {
+        totalService.zeroTotal();
 
-  /** For every repository we have, clone it down for processing. */
-  public void sync() {
-    totalTests = 0;
-    totalIgnored = 0;
+        return repositoryService.findAll().doOnNext(this::process).flatMap(repositoryService::save);
+    }
 
-    repositoryService.findAll().doOnNext(this::process).subscribe();
+    @SneakyThrows
+    private Mono<Repository> process(final Repository repository) {
+        repository.setState("Processing");
+        this.messageService.sendMessage("/topic/repository", repository);
 
-    log.info("Files with tests {}", totalTests);
-    log.info("Files with ignored {}", totalIgnored);
+        final Path path = gitService.clone(repository.getCloneUrl());
+        final List<Path> javaFiles = fileService.findAllJavaFiles(path);
 
-    configurationService.updateStats(totalTests, totalIgnored).subscribe();
-  }
+        totalService.increaseTotalTests(javaFiles.stream().filter(ContentUtils::hasTestContent).count());
+        totalService.increaseTotalIgnored(
+                javaFiles.stream()
+                        .filter(p -> ContentUtils.hasIgnoredContent(p) || ContentUtils.hasDisabledContent(p))
+                        .count());
 
-  @SneakyThrows
-  private void process(final Repository repository) {
-    final Path path = gitService.clone(repository.getCloneUrl());
+        repository.setState("Complete");
+        this.messageService.sendMessage("/topic/repository", repository);
 
-    final List<Path> javaFiles = fileService.findAllJavaFiles(path);
-
-    totalTests = (int) javaFiles.stream().filter(ContentUtils::hasTestContent).count();
-    totalIgnored =
-        (int)
-            javaFiles.stream()
-                .filter(
-                    p -> ContentUtils.hasIgnoredContent(p) || ContentUtils.hasDisabledContent(p))
-                .count();
-  }
+        return Mono.just(repository);
+    }
 }

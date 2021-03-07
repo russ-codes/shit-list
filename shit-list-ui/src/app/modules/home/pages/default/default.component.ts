@@ -6,9 +6,10 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Repository } from '../../../../core/domain/repository.module';
 import { ConfigurationService } from '../../../../core/services/configuration.service';
-import { Observable } from 'rxjs';
-import { Configuration } from '../../../../core/domain/configuration.module';
 import { TaskService } from '../../../../core/services/task.service';
+import { WebsocketService } from '../../../../core/services/websocket.service';
+import { IMessage } from '@stomp/stompjs';
+import { Total } from '../../../../core/domain/total.module';
 
 @Component({
   selector: 'app-default',
@@ -16,26 +17,49 @@ import { TaskService } from '../../../../core/services/task.service';
   styleUrls: ['./default.component.scss']
 })
 export class DefaultComponent implements OnInit, OnDestroy {
+  total: Total = {
+    totalTests: 0,
+    totalIgnored: 0
+  };
 
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  displayedColumns: string[] = ['cloneUrl', 'actions'];
+  displayedColumns: string[] = ['cloneUrl', 'state', 'actions'];
 
   dataSource = new MatTableDataSource();
 
-  configuration$: Observable<Configuration> = new Observable<Configuration>();
+  constructor(
+    private websockets: WebsocketService,
+    private repositoryService: RepositoryService,
+    private configurationService: ConfigurationService,
+    private taskService: TaskService,
+    private dialog: MatDialog
+  ) {
+    websockets.listen('repository').subscribe((message) => {
+      this.updateTableRow(message);
+    });
 
-  constructor(private repositoryService: RepositoryService, private configurationService: ConfigurationService, private taskService: TaskService, private dialog: MatDialog) {
+    websockets.listen('total').subscribe((message) => {
+      const total: Total = JSON.parse(message.body);
 
+      this.total.totalTests = total.totalTests;
+      this.total.totalIgnored = total.totalIgnored;
+    });
   }
 
-  ngOnDestroy(): void {
+  updateTableRow(message: IMessage) {
+    const repository: Repository = JSON.parse(message.body);
 
+    const index = this.dataSource.data.findIndex((value: any) => value.id === repository.id);
+    const data = this.dataSource.data;
+    data[index] = repository;
+
+    this.dataSource.data = data;
   }
+
+  ngOnDestroy(): void {}
 
   ngOnInit() {
-    this.configuration$ = this.configurationService.find();
-
     this.dataSource = this.repositoryService.tableData();
     this.dataSource.sort = this.sort;
   }

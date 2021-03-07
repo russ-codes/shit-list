@@ -10,6 +10,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -63,8 +64,14 @@ public class GitServiceImpl implements GitService {
 
     final Optional<Configuration> configuration = configurationRepository.findById(1L);
 
-    return configuration.map(
-        value ->
-            new UsernamePasswordCredentialsProvider(value.getUsername(), value.getAccessToken()));
+    return configuration
+        .filter(
+            c ->
+                StringUtils.isNoneEmpty(c.getAccessToken())
+                    && StringUtils.isNoneEmpty(c.getAccessToken()))
+        .map(
+            value ->
+                new UsernamePasswordCredentialsProvider(
+                    value.getUsername(), value.getAccessToken()));
   }
 }
