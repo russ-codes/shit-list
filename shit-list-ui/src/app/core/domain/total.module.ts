@@ -1,4 +1,4 @@
 export interface Total {
-  totalTests: number;
-  totalIgnored: number;
+  totalTests?: number;
+  totalIgnored?: number;
 }

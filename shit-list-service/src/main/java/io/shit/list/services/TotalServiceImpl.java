@@ -1,3 +1,4 @@
+/* Licensed under Apache-2.0 */
 package io.shit.list.services;
 
 import io.shit.list.domain.Total;
@@ -11,47 +12,50 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TotalServiceImpl implements TotalService {
 
-    private final TotalRepository totalRepository;
+  private final TotalRepository totalRepository;
 
-    private final MessageService messageService;
+  private final MessageService messageService;
 
-    @Override
-    public Total zeroTotal() {
-        final Total total = find();
+  @Override
+  public synchronized Total find() {
+    return totalRepository
+        .findById(1L)
+        .orElse(Total.builder().totalTests(0).totalIgnored(0).build());
+  }
 
-        total.setTotalTests(0);
-        total.setTotalIgnored(0);
+  @Override
+  public synchronized Total zeroTotal() {
+    final Total total = find();
 
-        return totalRepository.save(total);
-    }
+    total.setTotalTests(0);
+    total.setTotalIgnored(0);
 
-    @Override
-    public Total increaseTotalTests(long value) {
-        final Total total = find();
+    return totalRepository.save(total);
+  }
 
-        total.setTotalTests(total.getTotalTests() + value);
+  @Override
+  public synchronized Total increaseTotalTests(long value) {
+    final Total total = find();
 
-        return saveAndNotify(total);
-    }
+    total.setTotalTests(total.getTotalTests() + value);
 
-    @Override
-    public Total increaseTotalIgnored(long value) {
-        final Total total = find();
+    return saveAndNotify(total);
+  }
 
-        total.setTotalIgnored(total.getTotalIgnored() + value);
+  @Override
+  public synchronized Total increaseTotalIgnored(long value) {
+    final Total total = find();
 
-        return saveAndNotify(total);
-    }
+    total.setTotalIgnored(total.getTotalIgnored() + value);
 
-    private Total find() {
-        return totalRepository.findById(1L).orElse(Total.builder().build());
-    }
+    return saveAndNotify(total);
+  }
 
-    private Total saveAndNotify(Total total) {
-        final Total savedTotal = totalRepository.save(total);
+  private synchronized Total saveAndNotify(Total total) {
+    final Total savedTotal = totalRepository.save(total);
 
-        this.messageService.sendMessage("/topic/total", savedTotal);
+    this.messageService.sendMessage("/topic/total", savedTotal);
 
-        return savedTotal;
-    }
+    return savedTotal;
+  }
 }

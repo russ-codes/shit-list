@@ -18,8 +18,7 @@ public class RepositoryController {
 
   @PostMapping
   public Mono<Repository> save(@RequestBody final Repository repository) {
-
-    return repositoryService.save(repository);
+    return repositoryService.save(repository).flatMap(repositoryService::sync);
   }
 
   @GetMapping

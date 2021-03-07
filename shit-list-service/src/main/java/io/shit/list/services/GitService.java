@@ -1,11 +1,10 @@
 /* Licensed under Apache-2.0 */
 package io.shit.list.services;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import io.shit.list.domain.Repository;
+import java.util.concurrent.CompletableFuture;
 
 public interface GitService {
 
-  Path clone(String cloneUrl) throws GitAPIException, IOException;
+  CompletableFuture<Repository> cloneRepository(Repository repository);
 }

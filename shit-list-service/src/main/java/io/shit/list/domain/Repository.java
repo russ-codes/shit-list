@@ -20,9 +20,11 @@ public class Repository {
 
   private String cloneUrl;
 
+  private String directory;
+
   private long totalTests;
 
   private long totalIgnored;
 
-  private String state = "New";
+  private String state = "new";
 }

@@ -1,13 +1,15 @@
+/* Licensed under Apache-2.0 */
 package io.shit.list.services;
 
 import io.shit.list.domain.Total;
 
 public interface TotalService {
 
-    Total zeroTotal();
+  Total find();
 
-    Total increaseTotalTests(long value);
+  Total zeroTotal();
 
-    Total increaseTotalIgnored(long value);
+  Total increaseTotalTests(long value);
 
+  Total increaseTotalIgnored(long value);
 }

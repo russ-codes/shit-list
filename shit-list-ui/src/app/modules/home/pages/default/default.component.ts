@@ -10,6 +10,7 @@ import { TaskService } from '../../../../core/services/task.service';
 import { WebsocketService } from '../../../../core/services/websocket.service';
 import { IMessage } from '@stomp/stompjs';
 import { Total } from '../../../../core/domain/total.module';
+import { TotalService } from '../../../../core/services/total.service';
 
 @Component({
   selector: 'app-default',
@@ -17,33 +18,32 @@ import { Total } from '../../../../core/domain/total.module';
   styleUrls: ['./default.component.scss']
 })
 export class DefaultComponent implements OnInit, OnDestroy {
-  total: Total = {
-    totalTests: 0,
-    totalIgnored: 0
-  };
-
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
   displayedColumns: string[] = ['cloneUrl', 'state', 'actions'];
 
   dataSource = new MatTableDataSource();
 
+  total: Total = {};
+
   constructor(
+    private totalService: TotalService,
     private websockets: WebsocketService,
     private repositoryService: RepositoryService,
     private configurationService: ConfigurationService,
     private taskService: TaskService,
     private dialog: MatDialog
   ) {
+    this.totalService.find().subscribe((total) => {
+      this.total = total;
+    });
+
     websockets.listen('repository').subscribe((message) => {
       this.updateTableRow(message);
     });
 
     websockets.listen('total').subscribe((message) => {
-      const total: Total = JSON.parse(message.body);
-
-      this.total.totalTests = total.totalTests;
-      this.total.totalIgnored = total.totalIgnored;
+      this.total = JSON.parse(message.body);
     });
   }
 

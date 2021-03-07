@@ -21,5 +21,4 @@ public class Configuration {
   private String username;
 
   private String accessToken;
-
 }
