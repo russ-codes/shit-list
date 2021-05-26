@@ -18,7 +18,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // Apache
-    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'commons-io:commons-io:2.9.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     // Misc
