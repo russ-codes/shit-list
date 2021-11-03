@@ -46,7 +46,7 @@
     "protractor": "~7.0.0",
     "sort-package-json": "^1.46.0",
     "stylelint": "^13.7.2",
-    "stylelint-config-standard": "^21.0.0",
+    "stylelint-config-standard": "^23.0.0",
     "stylelint-order": "^4.1.0",
     "stylelint-scss": "^3.18.0",
     "ts-node": "~9.1.1",
