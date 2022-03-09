@@ -23,7 +23,7 @@ dependencies {
 
     // Misc
     implementation 'com.github.ben-manes.caffeine:caffeine'
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r'
 
     runtimeOnly 'com.h2database:h2'
 
